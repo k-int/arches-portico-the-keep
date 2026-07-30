@@ -1,13 +1,11 @@
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.models import Value
-import arches.app.utils.task_management as task_management
 
 from arches_keep_app.utils.bng_conversion import convert
 
 import warnings
 import xmltodict
-import re
 from django.http import HttpResponse
 from datetime import datetime
 import json
