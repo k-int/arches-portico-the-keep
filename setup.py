@@ -11,6 +11,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     python_requires=">=3.8",
+    install_requires=[
+        "xmltodict==1.0.4",
+    ],
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
