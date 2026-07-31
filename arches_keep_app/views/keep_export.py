@@ -1,13 +1,11 @@
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.models import Value
-import arches.app.utils.task_management as task_management
 
 from arches_keep_app.utils.bng_conversion import convert
 
 import warnings
 import xmltodict
-import re
 from django.http import HttpResponse
 from datetime import datetime
 import json
@@ -26,7 +24,6 @@ def process_resource(request):
             'mon_types': [],
         }
 
-        artifact_graph_id = "343cc20c-2c5a-11e8-90fa-0242ac120005"
         area_graph_id = "979aaf0b-7042-11ea-9674-287fcf6a5e72"
         monument_graph_id = "076f9381-7b00-11e9-8d6b-80000b44d1d9"
 
@@ -57,30 +54,6 @@ def process_resource(request):
             'feature_shape_id': "87d39b39-f44f-11eb-9b17-a87eeabdefba"
         }
 
-        artifact_node_ids = {
-            'system_refs_id': 'dd800bc9-b494-11ea-9af8-f875a44e0e11',
-            'primary_ref_id': 'dd8032af-b494-11ea-8110-f875a44e0e11',
-            'legacy_id': 'dd8032b1-b494-11ea-a183-f875a44e0e11',
-            'names_id': '5b0dfb23-7fe2-11ea-bf70-f875a44e0e11',
-            'name_id': '5b0dfb27-7fe2-11ea-8ac9-f875a44e0e11',
-            'name_type_id': "1e45d88a-7fe4-11ea-b374-f875a44e0e11",
-            'descriptions_id': 'c30977ad-991e-11ea-9368-f875a44e0e11',
-            'description_type_id': 'c30977b1-991e-11ea-b259-f875a44e0e11',
-            'description_id': 'c30977b0-991e-11ea-ba04-f875a44e0e11',
-            'national_grid_refs_id': 'f7cc62ae-f447-11eb-87da-a87eeabdefba',
-            'national_grid_ref_id': 'f7ccc89a-f447-11eb-93ce-a87eeabdefba',
-            'admin_areas_id': 'f7cc6299-f447-11eb-b8a3-a87eeabdefba',
-            'area_type_id': 'f7ccc8a2-f447-11eb-9310-a87eeabdefba',
-            'area_name_id': 'f7cca081-f447-11eb-ac78-a87eeabdefba',
-            'construction_phases_id': '99cfca45-381d-11e8-968a-dca90488358a',
-            'date_start_id': '99cfe72e-381d-11e8-882c-dca90488358a',
-            'date_end_id': '99cff7f8-381d-11e8-a059-dca90488358a',
-            'date_certainty_id': '546b1633-3ba4-11eb-a593-f875a44e0e11',
-            'date_qualifier_id': '1d9500e3-0e04-11eb-af9a-f875a44e0e11',
-            'geometry_node_id': 'f7cc629f-f447-11eb-b2d3-a87eeabdefba',
-            'feature_shape_id': 'f7cc8c75-f447-11eb-953a-a87eeabdefba'
-        }
-
         area_node_ids = {
             'system_refs_id': '8dca12af-edeb-11eb-bc5f-a87eeabdefba',
             'primary_ref_id': '8dca12b3-edeb-11eb-a9ee-a87eeabdefba',
@@ -108,7 +81,6 @@ def process_resource(request):
         }
 
         resources_with_no_pid = []
-        included_findspots = []
 
         for resource_id in resource_ids:
 
@@ -122,14 +94,11 @@ def process_resource(request):
 
                 exclude_flag = False
 
-                if str(resource.graph_id) not in [monument_graph_id, artifact_graph_id, area_graph_id]:
+                if str(resource.graph_id) not in [monument_graph_id, area_graph_id]:
                     exclude_flag = True
                 
                 if str(resource.graph_id) == monument_graph_id: # monument exclusions
                     for tile in resource.tiles:
-                        if str(tile.nodegroup_id) == "6af2a0cb-efc5-11eb-8436-a87eeabdefba": # designation and protection assignment
-                            if tile.data["6af2b696-efc5-11eb-b0b5-a87eeabdefba"]: 
-                                exclude_flag = True
 
                         if str(tile.nodegroup_id) == "055b3e3f-04c7-11eb-8d64-f875a44e0e11": # Associated Monuments, Areas or Artefacts
                             if tile.data["055b3e44-04c7-11eb-b131-f875a44e0e11"]:
@@ -150,30 +119,10 @@ def process_resource(request):
                         if str(tile.nodegroup_id) == "d17a5389-28cd-11eb-9670-f875a44e0e11": # area assignment
                             exclude_flag = True
 
-                
-                if str(resource.graph_id) == artifact_graph_id: # artefact exclusions
-                    for tile in resource.tiles:
-                        if str(tile.nodegroup_id) == artifact_node_ids['system_refs_id']:
-                            legacy_id = tile.data[artifact_node_ids['legacy_id']]
-
-                            if legacy_id:
-
-                                legacy_MES_id_match = re.search(r'\bMES\d+\b', legacy_id['en']['value'])
-                                legacy_MES_id = legacy_MES_id_match.group() if legacy_MES_id_match else None
-
-                                if not legacy_MES_id: # only artefacts with MES in legacy id
-                                    exclude_flag = True
-                                elif legacy_MES_id in included_findspots: # only included once
-                                    exclude_flag = True
-                                else:
-                                    included_findspots.append(legacy_MES_id)
-
                 if not exclude_flag:
                     
                     if str(resource.graph_id) == monument_graph_id:
                         id_lookup = monument_node_ids
-                    elif str(resource.graph_id) == artifact_graph_id:
-                        id_lookup = artifact_node_ids
                     elif str(resource.graph_id) == area_graph_id:
                         id_lookup = area_node_ids
 
@@ -395,27 +344,13 @@ def process_resource(request):
 
                     #### Finish MonUID1
                     if len(mon_names) > 0: 
-
-                        if str(resource.graph_id) == artifact_graph_id: # for artefacts, separate primary and alternative names, and take first alternative if exists
-                            primary_names = [name for name in mon_names if name["mon_name_type"] == '2df285fa-9cf2-45e7-bc05-a67b7d7ddc2f']
-                            alternative_names = [name for name in mon_names if name["mon_name_type"] == 'e9170ee3-3455-4ec3-b596-475c0969f3bf']
-
-                            if alternative_names:
-                                mon_object["Name"] = alternative_names[0]["mon_name"]
-                            else: 
-                                mon_object["Name"] = primary_names[0]["mon_name"]
-                    
-                        else: 
-                            mon_object["Name"] = mon_names[0]["mon_name"]
+                        mon_object["Name"] = mon_names[0]["mon_name"]
 
                     if len(mon_summaries) > 0: 
                         mon_object["Summary"] = max(mon_summaries, key=len)
                     
                     if len(mon_descriptions) > 0: 
-                        if str(resource.graph_id) == artifact_graph_id: # for artefacts, choose last full description
-                            mon_object["Description"] = mon_descriptions[-1]
-                        else: 
-                            mon_object["Description"] = max(mon_descriptions, key=len) # otherwise choose longest description
+                        mon_object["Description"] = max(mon_descriptions, key=len) # otherwise choose longest description
 
                     data_object["monument_entries"].append(mon_object)
 
