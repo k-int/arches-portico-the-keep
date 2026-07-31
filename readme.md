@@ -1,6 +1,8 @@
 # Arches Keep integration
 
-Current version for 7.5.x
+Current version for 7.6.x
+
+A fork of the K-int Ciim integration app. Users are able to select a date range using a plugin, before creating a Keep compatible xml export for the altered Monuments and Area resources. 
 
 ## APIs
 
