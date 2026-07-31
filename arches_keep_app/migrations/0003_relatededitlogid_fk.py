@@ -33,10 +33,10 @@ class Migration(migrations.Migration):
     # ... as for some unknown reason django can't see the arches models app in reverse.  In reverse if we have the model name as ...
     # ... arches_keep_app.latestresourceedit then the migration can reverse successfully, despite not looking at the correct linked table (editlog)
     applied_migrations = MigrationRecorder.Migration.objects.filter(app="arches_keep_app").values_list('name', flat=True)
-    if "0003_relatededitlogid_fk" in applied_migrations:
-        model_name = "arches_keep_app.latestresourceedit"
-    else:
-        model_name = "models.editlog"
+    # if "0003_relatededitlogid_fk" in applied_migrations:
+    #     model_name = "arches_keep_app.latestresourceedit"
+    # else:
+    model_name = "models.editlog"
 
     operations = [
         migrations.RenameField(
