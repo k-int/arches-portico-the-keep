@@ -42,4 +42,4 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["arches-portico-the-keep"]
+packages = ["arches_keep_app"]
