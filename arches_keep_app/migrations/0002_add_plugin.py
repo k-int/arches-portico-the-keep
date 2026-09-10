@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 component="views/components/plugins/keep_integration_dashboard",
                 componentname="keep_integration_dashboard",
                 slug="keep_integration_dashboard",
-                config={"show": True, "is_workflow": True, "description": ""},
+                config={"show": True, "is_workflow": False, "description": ""},
                 sortorder=1,
             )
 
