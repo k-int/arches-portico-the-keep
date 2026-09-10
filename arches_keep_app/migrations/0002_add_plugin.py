@@ -3,31 +3,31 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    initial = True
+    dependencies = [("arches_ciim_app", "0001_initial")]
 
-    dependencies = [
-        ("arches_keep_app", "0001_initial")
-    ]
+    def add_plugin(apps, schema_editor):
+        Plugin = apps.get_model("models", "Plugin")
 
-    forward = """
-        INSERT INTO plugins (
-            pluginid, name, icon, component, componentname, config, slug, sortorder)
-        VALUES (
-            'eb53e958-9ddf-40a9-8acd-da2b27df8340',
-            'Keep Integration Dashboard',
-            'fa fa-link',
-            'views/components/plugins/keep_integration_dashboard',
-            'keep_integration_dashboard', 
-            '{"show": true, "is_workflow": false, "description": ""}',
-            'keep_integration_dashboard',
-            '1'
-        );
-        """
-    
-    reverse = """
-        DELETE FROM plugins where pluginid = 'eb53e958-9ddf-40a9-8acd-da2b27df8340';
-        """
+        if not Plugin.objects.filter(
+            pk="eb53e958-9ddf-40a9-8acd-da2b27df8340"
+        ).exists():
+            Plugin.objects.update_or_create(
+                pluginid="eb53e958-9ddf-40a9-8acd-da2b27df8340",
+                name="The Keep Integration Dashboard",
+                icon="fa fa-link",
+                component="views/components/plugins/keep_integration_dashboard",
+                componentname="keep_integration_dashboard",
+                slug="keep_integration_dashboard",
+                config={"show": True, "is_workflow": True, "description": ""},
+                sortorder=1,
+            )
+
+    def remove_plugin(apps, schema_editor):
+        Plugin = apps.get_model("models", "Plugin")
+
+        for plugin in Plugin.objects.filter(pk="eb53e958-9ddf-40a9-8acd-da2b27df8340"):
+            plugin.delete()
 
     operations = [
-        migrations.RunSQL(forward, reverse),
+        migrations.RunPython(add_plugin, remove_plugin),
     ]

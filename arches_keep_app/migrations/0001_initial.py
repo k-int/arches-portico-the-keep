@@ -7,7 +7,9 @@ def populate_latest_resource_edits(apps, schema_editor):
     EditLogModel = apps.get_model("models", "EditLog")
     LatestResourceEditModel = apps.get_model("arches_keep_app", "LatestResourceEdit")
 
-    edits = EditLogModel.objects.order_by('resourceinstanceid', '-timestamp').distinct('resourceinstanceid')
+    edits = EditLogModel.objects.order_by("resourceinstanceid", "-timestamp").distinct(
+        "resourceinstanceid"
+    )
 
     for edit in edits:
         if edit.resourceinstanceid != settings.SYSTEM_SETTINGS_RESOURCE_ID:
@@ -34,25 +36,34 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        # the last migration in 7.5.x
+        ("models", "9945_file_thumbnail_bin_file_thumbnail_text"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='LatestResourceEdit',
+            name="LatestResourceEdit",
             fields=[
-                ('editlogid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('resourcedisplayname', models.TextField(blank=True, null=True)),
-                ('resourceinstanceid', models.TextField(blank=True, null=True)),
-                ('edittype', models.TextField(blank=True, null=True)),
-                ('graphid', models.TextField(blank=True, null=True)),
-                ('username', models.TextField(blank=True, null=True)),
-                ('userid', models.TextField(blank=True, null=True)),
-                ('timestamp', models.DateTimeField(blank=True, null=True)),
+                (
+                    "editlogid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
+                ("resourcedisplayname", models.TextField(blank=True, null=True)),
+                ("resourceinstanceid", models.TextField(blank=True, null=True)),
+                ("edittype", models.TextField(blank=True, null=True)),
+                ("graphid", models.TextField(blank=True, null=True)),
+                ("username", models.TextField(blank=True, null=True)),
+                ("userid", models.TextField(blank=True, null=True)),
+                ("timestamp", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'db_table': 'latest_resource_edit',
-                'managed': True,
+                "db_table": "latest_resource_edit",
+                "managed": True,
             },
         ),
-        migrations.RunPython(populate_latest_resource_edits, remove_latest_resource_edits),        
+        migrations.RunPython(
+            populate_latest_resource_edits, remove_latest_resource_edits
+        ),
     ]
