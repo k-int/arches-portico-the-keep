@@ -3,7 +3,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("arches_ciim_app", "0001_initial")]
+    dependencies = [("arches_keep_app", "0001_initial")]
 
     def add_plugin(apps, schema_editor):
         Plugin = apps.get_model("models", "Plugin")
