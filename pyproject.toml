@@ -29,7 +29,7 @@ dependencies = [
     "arches>=7.5.5,<7.6.0",
     "xmltodict",
 ]
-version = "0.0.1"
+version = "1.0.0"
 
 [project.optional-dependencies]
 dev = [
