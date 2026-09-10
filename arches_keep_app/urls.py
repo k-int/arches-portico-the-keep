@@ -8,8 +8,10 @@ from arches_keep_app.views.keep_export import process_resource
 
 urlpatterns = [
     re_path(r"^resource/changes", ChangesView.as_view(), name="ChangesView"),
-    re_path(r"^concept/export", ConceptsExportView.as_view(), name="ConceptsExportView"),    
-    re_path(r"^keep/export/$", process_resource, name='process_resource'),
+    re_path(
+        r"^concept/export", ConceptsExportView.as_view(), name="ConceptsExportView"
+    ),
+    re_path(r"^keep/export/$", process_resource, name="process_resource"),
 ]
 
 # Ensure Arches core urls are superseded by project-level urls
