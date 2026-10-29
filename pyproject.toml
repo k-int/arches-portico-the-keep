@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "arches-portico-the-keep"
+name = "arches_keep_app"
 readme = "README.md"
 authors = [
     {name = "Knowledge Integration", email = "arches@k-int.com"}
